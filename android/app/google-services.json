@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "433653231467",
+    "project_id": "bunudaoku-b3b62",
+    "storage_bucket": "bunudaoku-b3b62.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:433653231467:android:d2dddbdc1716970cb0262e",
+        "android_client_info": {
+          "package_name": "com.example.bunudaoku"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "433653231467-2efqa9s6lgov8e9rfoq168a3vup4d2pd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.bunudaoku",
+            "certificate_hash": "a181bc9c779e593320ea707b3b097ba956bd001f"
+          }
+        },
+        {
+          "client_id": "433653231467-hsg6r90kb70mgikgvbeaedlupj5m7jqi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdUY8qZ3iJidll67o25RKFbginszJLyhg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "433653231467-hsg6r90kb70mgikgvbeaedlupj5m7jqi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -27,7 +27,7 @@ class _KitapEkleCiktiState extends State<KitapEkleCikti> {
             const SizedBox(
               height: 40,
             ),
-            Text("Eklenencek Kitabın \n\nAdı: $ad \n\nYazarı: $yazar",
+            Text("Kitap Eklendi",
                 style: const TextStyle(
                   color: Colors.black,
                   fontSize: 25,

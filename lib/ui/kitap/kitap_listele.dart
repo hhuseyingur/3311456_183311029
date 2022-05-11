@@ -1,4 +1,5 @@
 // ignore: file_names
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class KitapListele extends StatefulWidget {
@@ -11,7 +12,15 @@ class KitapListele extends StatefulWidget {
 class _KitapListeleState extends State<KitapListele> {
   @override
   Widget build(BuildContext context) {
+
+    CollectionReference tests = FirebaseFirestore.instance.collection('testCollection');
     var kitapListe = [
+      ListTile(
+        //onTap:() {},
+        contentPadding: EdgeInsets.all(5),
+        tileColor: Colors.lightBlueAccent,
+        title: Text(tests.doc('YDtImZVDES8EqRNZZ8fj').id),
+      ),
       const ListTile(
         //onTap:() {},
         contentPadding: EdgeInsets.all(5),
