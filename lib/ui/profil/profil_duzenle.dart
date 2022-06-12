@@ -42,7 +42,8 @@ class ProfilDuzenle extends StatelessWidget {
               ),
               onPressed: () {},
               child: const Text('Düzenle'),
-            )),
+            ),
+            ),
           ),
         ])));
   }

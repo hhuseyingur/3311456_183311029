@@ -4,60 +4,41 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import 'kitap_ekle_cikti.dart';
 
-
-class KitapEkle extends StatefulWidget {
-  const KitapEkle({Key? key}) : super(key: key);
-
-  @override
-  State<KitapEkle> createState() => _KitapEkleState();
-}
-
-class _KitapEkleState extends State<KitapEkle> {
-
-  final _formKey = GlobalKey<FormState>();
+class KitapDuzenle extends StatelessWidget {
+  KitapDuzenle({Key? key, required this.kitap, this.kitapid}) : super(key:key);
+  final Kitap? kitap;
+  final kitapid;
   final adController = TextEditingController();
   final yazarController = TextEditingController();
   final ozetController = TextEditingController();
-  var kitapAdi = "";
-  var kitapYazar = "";
-  var kitapOzet = "";
 
-  @override
-  void dispose(){
-    adController.dispose();
-    yazarController.dispose();
-    ozetController.dispose();
-    super.dispose();
-  }
-  
   clearText(){
     adController.clear();
     yazarController.clear();
     ozetController.clear();
   }
-  
+
   CollectionReference kitaplar = FirebaseFirestore.instance.collection('kitaplar');
 
-  Future<void> addKitap(){
-
-    var kitap = Kitap(kitapadi: adController.text,
-        kitapozet: ozetController.text,
-        kitapyazar: yazarController.text);
-
-    return kitaplar.add(kitap.toJson())
+  Future<void> updateKitap(){
+    kitap?.kitapozet = ozetController.text;
+    kitap?.kitapyazar = yazarController.text;
+    kitap?.kitapadi = adController.text;
+    return kitaplar
+        .doc(kitap?.kitapid)
+        .update(kitap!.toJson())
         .then((value) => {
-          Fluttertoast.showToast(
-            msg: "Kitap Başarıyla Eklendi",
+      Fluttertoast.showToast(
+          msg: "Kitap Başarıyla Eklendi",
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
           backgroundColor: Colors.green,
           textColor: Colors.white70,
           fontSize: 16.0),
-          print("Kitap Eklendi")
-        })
+      print("Kitap Güncellendi")
+    })
         .catchError((error)=> {
       Fluttertoast.showToast(
           msg: "Bir Hata Oluştu $error",
@@ -67,19 +48,21 @@ class _KitapEkleState extends State<KitapEkle> {
           backgroundColor: Colors.red,
           textColor: Colors.white70,
           fontSize: 16.0),
-          print('Hata oluştu: $error')
-        });
-
+      print('Hata oluştu: $error')
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    adController.text = kitap!.kitapadi;
+    yazarController.text = kitap!.kitapyazar;
+    ozetController.text = kitap!.kitapozet;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Yeni Kitap Ekle"),
+        title: const Text("Kitap Düzenle"),
       ),
       body: Form(
-        key: _formKey,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
           child: ListView(
@@ -149,19 +132,10 @@ class _KitapEkleState extends State<KitapEkle> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      // Validate returns true if the form is valid, otherwise false.
-                      if (_formKey.currentState!.validate()) {
-                        setState(() {
-                          // kitapAdi = adController.text;
-                          // kitapYazar = yazarController.text;
-                          // kitapOzet = ozetController.text;
-                          addKitap();
-                          clearText();
-                        });
-                      }
+                          updateKitap();
                     },
                     child: const Text(
-                      'Kitap Ekle',
+                      'Kitap Düzenle',
                       style: TextStyle(fontSize: 18.0),
                     ),
                   ),
@@ -182,12 +156,4 @@ class _KitapEkleState extends State<KitapEkle> {
     );
   }
 
-  bool formControl() {
-    var adControl = adController.text;
-    var yazarControl = yazarController.text;
-    if (adControl.isEmpty && yazarControl.isEmpty) {
-      return false;
-    }
-    return true;
-  }
 }

@@ -158,18 +158,15 @@ class _DergiEkleState extends State<DergiEkle> {
                       style: TextStyle(fontSize: 18.0),
                     )
                     ),
-                    ElevatedButton(onPressed: ()=> clearText(),
+                    ElevatedButton(onPressed: clearText,
                       style: ElevatedButton.styleFrom(primary: Colors.blueGrey),
                       child: const Text(
                           'Temizle / İptal',
                           style: TextStyle(fontSize: 18.0),
                         ),
-
                     )
                   ],
                 )
-
-
               ],
             ),
           ),
