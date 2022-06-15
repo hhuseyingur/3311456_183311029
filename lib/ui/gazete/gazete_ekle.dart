@@ -31,7 +31,7 @@ class _GazeteEkleState extends State<GazeteEkle> {
   CollectionReference gazeteler = FirebaseFirestore.instance.collection('gazeteler');
 
   Future<void> addGazete(){
-    var gazete = Gazete(adController.text, noController.text);
+    Gazete  gazete = Gazete(gazeteadi: adController.text, gazeteno: noController.text);
 
     return gazeteler.add(gazete.toJson())
         .then((value) => Fluttertoast.showToast(
@@ -116,6 +116,7 @@ class _GazeteEkleState extends State<GazeteEkle> {
                       setState(() {
                         addGazete();
                         clearText();
+                        Navigator.pop(context);
                       });
                     }
                   }, child: const Text(

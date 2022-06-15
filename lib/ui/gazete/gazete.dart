@@ -16,9 +16,9 @@ class _GazeteSayfaState extends State<GazeteSayfa> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Gazeteler'),
+        title: const Text('Gazeteler'),
       ),
-      body: GazeteListele(),
+      body: const GazeteListele(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(

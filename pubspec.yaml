@@ -38,6 +38,11 @@ dependencies:
   flutter_pw_validator: ^1.4.2
   linked_scroll_controller: ^0.2.0
   modal_bottom_sheet: ^2.0.1
+  sqflite: ^2.0.0-nullsafety.2
+  permission_handler:
+  shared_preferences: ^2.0.13
+  image_picker: ^0.8.5
+  image_cropper: ^2.0.2
 
 flutter_native_splash:
   color: "#4285F4"

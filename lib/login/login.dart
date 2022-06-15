@@ -1,7 +1,6 @@
-
+import 'package:bunudaoku/models/Kullanici.dart';
+import 'package:bunudaoku/shared_preferences.dart/auth_sp.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -20,33 +19,31 @@ class LoginPage extends StatelessWidget {
         primarySwatch: Colors.blue,
         fontFamily: 'SanFrancisco',
       ),
-      home:
-      Scaffold(
+      home: Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: const Color.fromRGBO(40, 38, 56, 1),
         body: Container(
           decoration: BoxDecoration(
               image: DecorationImage(
-                  image: NetworkImage("https://mir-s3-cdn-cf.behance.net/project_modules/disp/496ecb14589707.562865d064f9e.png"),
-                  fit: BoxFit.cover
-              )
-          ),
+                  image: NetworkImage(
+                      "https://mir-s3-cdn-cf.behance.net/project_modules/disp/496ecb14589707.562865d064f9e.png"),
+                  fit: BoxFit.cover)),
           child: LoginScreen(),
         ),
         bottomNavigationBar: BottomAppBar(
-            color: Colors.transparent,
-            elevation: 0,
-            child: SizedBox(
-              child: Container(
-                  padding: EdgeInsets.all(20),
-                  child: Text(
-                    "Hasan Hüseyin Gür",
-                    style: TextStyle(color: Colors.white),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+          color: Colors.transparent,
+          elevation: 0,
+          child: SizedBox(
+            child: Container(
+              padding: EdgeInsets.all(20),
+              child: Text(
+                "Hasan Hüseyin Gür",
+                style: TextStyle(color: Colors.white),
+                textAlign: TextAlign.center,
+              ),
             ),
-            ),
+          ),
+        ),
       ),
     );
   }
@@ -67,6 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool loading = false;
     return Container(
       height: MediaQuery.of(context).size.height,
       child: SingleChildScrollView(
@@ -81,7 +79,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               Center(
                 child: Container(
-
                   height: 100,
                   width: MediaQuery.of(context).size.width,
                   alignment: Alignment.center,
@@ -136,7 +133,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           border: InputBorder.none,
                           hintText: "Email",
                           contentPadding: EdgeInsets.all(20)),
-                      onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                      onEditingComplete: () =>
+                          FocusScope.of(context).nextFocus(),
                     ),
                     Divider(
                       thickness: 3,
@@ -170,78 +168,90 @@ class _LoginScreenState extends State<LoginScreen> {
               Container(
                 width: 570,
                 height: 70,
-                padding: EdgeInsets.only(top: 20),
-                child: RaisedButton(
-                    color: Colors.pink,
-                    child: const Text("Giriş Yap",
-                        style: TextStyle(color: Colors.white)),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)),
-                    onPressed: () async {
-                      try{
-                        final credentials = await FirebaseAuth.instance.signInWithEmailAndPassword(
-                            email: usernameController.text,
-                            password: passwordController.text);
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (context) => MyHomePage()),
+                padding: const EdgeInsets.only(top: 20),
+                child: loading == true
+                    ? const SizedBox(
+                        width: 50, child: CircularProgressIndicator())
+                    : RaisedButton(
+                        color: Colors.pink,
+                        child: const Text("Giriş Yap",
+                            style: TextStyle(color: Colors.white)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30)),
+                        onPressed: () async {
+                          setState(() {
+                            loading = true;
+                          });
+                          try {
+                            final credentials = await FirebaseAuth.instance
+                                .signInWithEmailAndPassword(
+                                    email: usernameController.text,
+                                    password: passwordController.text);
+                            AuthStorage.sessionOn(
+                                kullanici: Kullanici(
+                                    email: usernameController.text,
+                                    password: passwordController.text));
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => MyHomePage()),
                               (Route<dynamic> route) => false,
-                        );
-
-                      } on FirebaseAuthException catch (e) {
-                        if(e.code == "user-not-found") {
-                          Fluttertoast.showToast(
-                              msg: "Kullanıcı Bulunamadı",
-                              toastLength: Toast.LENGTH_LONG,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.red,
-                              textColor: Colors.white70,
-                              fontSize: 16.0);
-                        }
-                        else {
-                          Fluttertoast.showToast(
-                              msg: "Şifre Yanlış",
-                              toastLength: Toast.LENGTH_LONG,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.red,
-                              textColor: Colors.white70,
-                              fontSize: 16.0);
-                        }
-                        print(e);
-                      }
-
-
-
-                    }),
+                            );
+                          } on FirebaseAuthException catch (e) {
+                            if (e.code == "user-not-found") {
+                              Fluttertoast.showToast(
+                                  msg: "Kullanıcı Bulunamadı",
+                                  toastLength: Toast.LENGTH_LONG,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIosWeb: 1,
+                                  backgroundColor: Colors.red,
+                                  textColor: Colors.white70,
+                                  fontSize: 16.0);
+                            } else {
+                              Fluttertoast.showToast(
+                                  msg: "Şifre Yanlış",
+                                  toastLength: Toast.LENGTH_LONG,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIosWeb: 1,
+                                  backgroundColor: Colors.red,
+                                  textColor: Colors.white70,
+                                  fontSize: 16.0);
+                            }
+                            print(e);
+                          }
+                          setState(() {
+                            loading = false;
+                          });
+                        }),
               ),
               Container(
-                  padding: EdgeInsets.only(top: 40, left: 20, right: 20),
+                  padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
                   child: Center(
                       child: RichText(
-                        text: TextSpan(
-                          text: "Hesabınız yok mu? ",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                          ),
-                          children: [
-                            TextSpan(
-                                text: " Kayıt Ol",
-                                style: TextStyle(
-                                    color: Colors.blue, fontWeight: FontWeight.bold),
-                                recognizer: new TapGestureRecognizer()
-                                  ..onTap = () => {
+                    text: TextSpan(
+                      text: "Hesabınız yok mu? ",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                      ),
+                      children: [
+                        TextSpan(
+                            text: " Kayıt Ol",
+                            style: const TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.bold),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () => {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => KayitOl()),
+                                          builder: (context) =>
+                                              const KayitOl()),
                                     )
                                   }),
-                          ],
-                        ),
-                      )))
+                      ],
+                    ),
+                  )))
             ],
           )),
     );

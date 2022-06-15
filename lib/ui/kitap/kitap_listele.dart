@@ -2,7 +2,6 @@
 import 'package:bunudaoku/ui/kitap/kitap_duzenle.dart';
 import 'package:bunudaoku/ui/kitap/kitap_sil.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -227,7 +226,7 @@ class _KitapListeleState extends State<KitapListele> {
             ),
           );
         });
-    var kitapListe = [
+    /*var kitapListe = [
       ListTile(
         //onTap:() {},
         contentPadding: EdgeInsets.all(5),
@@ -253,6 +252,6 @@ class _KitapListeleState extends State<KitapListele> {
         title: Text('Kitap 3'),
         subtitle: Text('Yazar : Yazar 3'),
       ),
-    ];
+    ];**/
   }
 }

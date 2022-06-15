@@ -6,7 +6,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import 'kitap_ekle_cikti.dart';
 
-
 class KitapEkle extends StatefulWidget {
   const KitapEkle({Key? key}) : super(key: key);
 
@@ -15,7 +14,6 @@ class KitapEkle extends StatefulWidget {
 }
 
 class _KitapEkleState extends State<KitapEkle> {
-
   final _formKey = GlobalKey<FormState>();
   final adController = TextEditingController();
   final yazarController = TextEditingController();
@@ -25,51 +23,52 @@ class _KitapEkleState extends State<KitapEkle> {
   var kitapOzet = "";
 
   @override
-  void dispose(){
+  void dispose() {
     adController.dispose();
     yazarController.dispose();
     ozetController.dispose();
     super.dispose();
   }
-  
-  clearText(){
+
+  clearText() {
     adController.clear();
     yazarController.clear();
     ozetController.clear();
   }
-  
-  CollectionReference kitaplar = FirebaseFirestore.instance.collection('kitaplar');
 
-  Future<void> addKitap(){
+  CollectionReference kitaplar =
+      FirebaseFirestore.instance.collection('kitaplar');
 
-    var kitap = Kitap(kitapadi: adController.text,
+  Future<void> addKitap() {
+    var kitap = Kitap(
+        kitapadi: adController.text,
         kitapozet: ozetController.text,
         kitapyazar: yazarController.text);
 
-    return kitaplar.add(kitap.toJson())
+    return kitaplar
+        .add(kitap.toJson())
         .then((value) => {
-          Fluttertoast.showToast(
-            msg: "Kitap Başarıyla Eklendi",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.green,
-          textColor: Colors.white70,
-          fontSize: 16.0),
-          print("Kitap Eklendi")
-        })
-        .catchError((error)=> {
-      Fluttertoast.showToast(
-          msg: "Bir Hata Oluştu $error",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white70,
-          fontSize: 16.0),
-          print('Hata oluştu: $error')
-        });
-
+              Fluttertoast.showToast(
+                  msg: "Kitap Başarıyla Eklendi",
+                  toastLength: Toast.LENGTH_LONG,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.green,
+                  textColor: Colors.white70,
+                  fontSize: 16.0),
+              print("Kitap Eklendi")
+            })
+        .catchError((error) => {
+              Fluttertoast.showToast(
+                  msg: "Bir Hata Oluştu $error",
+                  toastLength: Toast.LENGTH_LONG,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white70,
+                  fontSize: 16.0),
+              print('Hata oluştu: $error')
+            });
   }
 
   @override
@@ -93,7 +92,7 @@ class _KitapEkleState extends State<KitapEkle> {
                     labelStyle: TextStyle(fontSize: 20.0),
                     border: OutlineInputBorder(),
                     errorStyle:
-                    TextStyle(color: Colors.redAccent, fontSize: 15),
+                        TextStyle(color: Colors.redAccent, fontSize: 15),
                   ),
                   controller: adController,
                   validator: (value) {
@@ -102,6 +101,7 @@ class _KitapEkleState extends State<KitapEkle> {
                     }
                     return null;
                   },
+                  textInputAction: TextInputAction.next,
                 ),
               ),
               Container(
@@ -113,7 +113,7 @@ class _KitapEkleState extends State<KitapEkle> {
                     labelStyle: TextStyle(fontSize: 20.0),
                     border: OutlineInputBorder(),
                     errorStyle:
-                    TextStyle(color: Colors.redAccent, fontSize: 15),
+                        TextStyle(color: Colors.redAccent, fontSize: 15),
                   ),
                   controller: yazarController,
                   validator: (value) {
@@ -122,6 +122,7 @@ class _KitapEkleState extends State<KitapEkle> {
                     }
                     return null;
                   },
+                  textInputAction: TextInputAction.next,
                 ),
               ),
               Container(
@@ -133,7 +134,7 @@ class _KitapEkleState extends State<KitapEkle> {
                     labelStyle: TextStyle(fontSize: 20.0),
                     border: OutlineInputBorder(),
                     errorStyle:
-                    TextStyle(color: Colors.redAccent, fontSize: 15),
+                        TextStyle(color: Colors.redAccent, fontSize: 15),
                   ),
                   controller: ozetController,
                   validator: (value) {
@@ -142,6 +143,8 @@ class _KitapEkleState extends State<KitapEkle> {
                     }
                     return null;
                   },
+                  maxLines: 10,
+                  textInputAction: TextInputAction.newline,
                 ),
               ),
               Row(
@@ -152,11 +155,9 @@ class _KitapEkleState extends State<KitapEkle> {
                       // Validate returns true if the form is valid, otherwise false.
                       if (_formKey.currentState!.validate()) {
                         setState(() {
-                          // kitapAdi = adController.text;
-                          // kitapYazar = yazarController.text;
-                          // kitapOzet = ozetController.text;
                           addKitap();
                           clearText();
+                          Navigator.pop(context);
                         });
                       }
                     },

@@ -1,42 +1,41 @@
-import 'package:bunudaoku/models/Kitap.dart';
+import 'package:bunudaoku/models/Dergi.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class KitapDuzenle extends StatelessWidget {
-  KitapDuzenle({Key? key, required this.kitap, this.kitapid}) : super(key: key);
-  final Kitap? kitap;
-  final kitapid;
+class DergiDuzenle extends StatelessWidget {
+  DergiDuzenle({Key? key, required this.dergi}) : super(key: key);
+  final Dergi dergi;
   final adController = TextEditingController();
-  final yazarController = TextEditingController();
+  final sayiController = TextEditingController();
   final ozetController = TextEditingController();
 
   clearText() {
     adController.clear();
-    yazarController.clear();
+    sayiController.clear();
     ozetController.clear();
   }
 
-  CollectionReference kitaplar =
-      FirebaseFirestore.instance.collection('kitaplar');
+  CollectionReference dergiler =
+      FirebaseFirestore.instance.collection('dergiler');
 
-  Future<void> updateKitap() {
-    kitap?.kitapozet = ozetController.text;
-    kitap?.kitapyazar = yazarController.text;
-    kitap?.kitapadi = adController.text;
-    return kitaplar
-        .doc(kitap?.kitapid)
-        .update(kitap!.toJson())
+  Future<void> updateDergi() {
+    dergi.dergiadi = adController.text;
+    dergi.dergisayi = sayiController.text;
+    dergi.dergiozet = ozetController.text;
+    return dergiler
+        .doc(dergi.id)
+        .update(dergi.toJson())
         .then((value) => {
               Fluttertoast.showToast(
-                  msg: "Kitap Başarıyla Eklendi",
+                  msg: "Dergi Başarıyla Eklendi",
                   toastLength: Toast.LENGTH_LONG,
                   gravity: ToastGravity.BOTTOM,
                   timeInSecForIosWeb: 1,
                   backgroundColor: Colors.green,
                   textColor: Colors.white70,
                   fontSize: 16.0),
-              print("Kitap Güncellendi")
+              print("Dergi Güncellendi")
             })
         .catchError((error) => {
               Fluttertoast.showToast(
@@ -53,13 +52,12 @@ class KitapDuzenle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    adController.text = kitap!.kitapadi;
-    yazarController.text = kitap!.kitapyazar;
-    ozetController.text = kitap!.kitapozet;
-
+    adController.text = dergi.dergiadi;
+    sayiController.text = dergi.dergisayi;
+    ozetController.text = dergi.dergiozet;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Kitap Düzenle"),
+        title: const Text("Dergi Düzenle"),
       ),
       body: Form(
         child: Padding(
@@ -71,7 +69,7 @@ class KitapDuzenle extends StatelessWidget {
                 child: TextFormField(
                   autofocus: false,
                   decoration: const InputDecoration(
-                    labelText: 'Kitap Adı: ',
+                    labelText: 'Dergi Adı: ',
                     labelStyle: TextStyle(fontSize: 20.0),
                     border: OutlineInputBorder(),
                     errorStyle:
@@ -80,7 +78,7 @@ class KitapDuzenle extends StatelessWidget {
                   controller: adController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Kitap Adı Girin';
+                      return 'Dergi Adı Girin';
                     }
                     return null;
                   },
@@ -92,16 +90,16 @@ class KitapDuzenle extends StatelessWidget {
                 child: TextFormField(
                   autofocus: false,
                   decoration: const InputDecoration(
-                    labelText: 'Yazar: ',
+                    labelText: 'Sayı: ',
                     labelStyle: TextStyle(fontSize: 20.0),
                     border: OutlineInputBorder(),
                     errorStyle:
                         TextStyle(color: Colors.redAccent, fontSize: 15),
                   ),
-                  controller: yazarController,
+                  controller: sayiController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Kitap Yazarı Girin';
+                      return 'Dergi Sayı Girin';
                     }
                     return null;
                   },
@@ -122,7 +120,7 @@ class KitapDuzenle extends StatelessWidget {
                   controller: ozetController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Özet Girin';
+                      return 'Dergi Özet Girin';
                     }
                     return null;
                   },
@@ -130,16 +128,17 @@ class KitapDuzenle extends StatelessWidget {
                   textInputAction: TextInputAction.newline,
                 ),
               ),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      updateKitap();
+                      updateDergi();
                       Navigator.pop(context);
                     },
                     child: const Text(
-                      'Kitap Düzenle',
+                      'Dergi Düzenle',
                       style: TextStyle(fontSize: 18.0),
                     ),
                   ),

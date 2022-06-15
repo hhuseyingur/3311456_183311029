@@ -1,10 +1,12 @@
 
+import 'package:bunudaoku/db/db_helper.dart';
 import 'package:bunudaoku/ui/dergi/dergi.dart';
 import 'package:bunudaoku/ui/gazete/gazete.dart';
 import 'package:bunudaoku/ui/kitap/kitap.dart';
 import 'package:bunudaoku/ui/profil/profil.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart';
 
 // ignore: must_be_immutable
 class MyHomePage extends StatefulWidget {
@@ -39,6 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
     gazeteSayfa = GazeteSayfa(key: keyGazeteSayfa);
     profilSayfa = ProfilSayfa(key: keyProfilSayfa);
     allPages = [kitapSayfa, dergiSayfa, gazeteSayfa, profilSayfa];
+    VeritabaniYardimcisi.veritabaniErisim();
   }
 
   @override

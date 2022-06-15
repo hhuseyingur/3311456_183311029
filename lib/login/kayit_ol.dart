@@ -57,12 +57,12 @@ class _KayitOlIcerik extends State<KayitOlIcerik> {
   Future kayitOl() async {
 
     if(sifre1Controller.text == sifre2Controller.text){
-      var user = Kullanici(mailController.text,sifre1Controller.text);
+      var user = Kullanici(email: mailController.text,password: sifre1Controller.text);
       try {
 
         final authresult = await _auth.createUserWithEmailAndPassword(
           email: user.email,
-          password: user.parola,
+          password: user.password,
         );
 
         Navigator.of(context).pushAndRemoveUntil(

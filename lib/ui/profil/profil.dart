@@ -1,4 +1,8 @@
+import 'dart:io';
 
+import 'package:bunudaoku/db/userdao.dart';
+import 'package:bunudaoku/models/Kullanici.dart';
+import 'package:bunudaoku/shared_preferences.dart/auth_sp.dart';
 import 'package:bunudaoku/ui/profil/profil_duzenle.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +17,33 @@ class ProfilSayfa extends StatefulWidget {
 }
 
 class _ProfilSayfaState extends State<ProfilSayfa> {
+  Kullanici? kullanici;
+  String? name;
+  String? lastName;
+  String? imgPath;
+
+  kullaniciGetir() async {
+    final Kullanici? gelenKullanici = await UserDao.kullaniciGetir();
+    if (gelenKullanici != null) {
+      setState(() {
+        kullanici = gelenKullanici;
+        name = gelenKullanici.name;
+        lastName = gelenKullanici.lastName;
+        imgPath = gelenKullanici.imgPath;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    //kullaniciGetir();
+  }
+
   @override
   Widget build(BuildContext context) {
+    kullaniciGetir();
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.transparent,
@@ -23,6 +52,7 @@ class _ProfilSayfaState extends State<ProfilSayfa> {
             IconButton(
                 onPressed: () {
                   FirebaseAuth.instance.signOut();
+                  AuthStorage.sessionOff();
                   Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
@@ -39,7 +69,7 @@ class _ProfilSayfaState extends State<ProfilSayfa> {
           children: [
             Container(
               alignment: Alignment.center,
-              child: buildImage(),
+              child: buildImage(imgPath: imgPath),
             ),
             const SizedBox(
               height: 10,
@@ -47,7 +77,7 @@ class _ProfilSayfaState extends State<ProfilSayfa> {
             Container(
               child: Column(
                 children: [
-                  Text("Kullanıcı Adı"),
+                  Text((name ?? "Ad girilmemiş") + " " + (lastName ?? "")),
                   const SizedBox(
                     height: 10,
                   ),
@@ -84,10 +114,25 @@ class _ProfilSayfaState extends State<ProfilSayfa> {
   }
 
   final double profileHeight = 144;
-  Widget buildImage() => CircleAvatar(
-        radius: profileHeight / 2,
-        backgroundColor: Colors.blue,
-        backgroundImage: const NetworkImage(
-            'https://www.nicepng.com/png/full/128-1280406_view-user-icon-png-user-circle-icon-png.png'),
-      );
+
+  Widget buildImage({String? imgPath}) {
+    return CircleAvatar(
+      radius: profileHeight / 2,
+      backgroundColor: Colors.blue,
+      backgroundImage: imgPath == null
+          ? const NetworkImage(
+              'https://www.nicepng.com/png/full/128-1280406_view-user-icon-png-user-circle-icon-png.png')
+          : null,
+      child: imgPath == null
+          ? null
+          : ClipOval(
+              child: Image.file(
+                File(imgPath),
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                fit: BoxFit.cover,
+              ),
+            ),
+    );
+  }
 }

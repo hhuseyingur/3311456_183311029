@@ -1,7 +1,11 @@
+import 'package:bunudaoku/models/Gazete.dart';
+import 'package:bunudaoku/ui/gazete/gazete_detay.dart';
+import 'package:bunudaoku/ui/gazete/gazete_duzenle.dart';
+import 'package:bunudaoku/widget/list_tile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:flutter/cupertino.dart';
 
 class GazeteListele extends StatefulWidget {
   const GazeteListele({Key? key}) : super(key: key);
@@ -11,40 +15,44 @@ class GazeteListele extends StatefulWidget {
 }
 
 class _GazeteListeleState extends State<GazeteListele> {
-
-  final Stream<QuerySnapshot> gazetelerStream = FirebaseFirestore.instance.collection('gazeteler').snapshots();
+  Stream<QuerySnapshot> gazetelerStream =
+      FirebaseFirestore.instance.collection('gazeteler').snapshots();
 
   //Delete
-  CollectionReference gazeteler = FirebaseFirestore.instance.collection('gazeteler');
-  Future<void> deleteGazete(id){
-    return gazeteler.doc(id).delete()
-        .then((value) =>{
-      Fluttertoast.showToast(
-          msg: 'Gazete Başarıyla Silindi',
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.amber,
-          textColor: Colors.black87,
-          fontSize: 16.0)})
-        .catchError((error)=>{
-      Fluttertoast.showToast(
-          msg: 'HATA OLUŞTU !! $error',
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white70,
-          fontSize: 16.0)
-    });
+  CollectionReference gazeteler =
+      FirebaseFirestore.instance.collection('gazeteler');
+  Future<void> deleteGazete(id) {
+    return gazeteler
+        .doc(id)
+        .delete()
+        .then((value) => {
+              Fluttertoast.showToast(
+                  msg: 'Gazete Başarıyla Silindi',
+                  toastLength: Toast.LENGTH_LONG,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.amber,
+                  textColor: Colors.black87,
+                  fontSize: 16.0)
+            })
+        .catchError((error) => {
+              Fluttertoast.showToast(
+                  msg: 'HATA OLUŞTU !! $error',
+                  toastLength: Toast.LENGTH_LONG,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white70,
+                  fontSize: 16.0)
+            });
   }
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
         stream: gazetelerStream,
-        builder: (BuildContext context,AsyncSnapshot<QuerySnapshot> snapshot ){
-          if(snapshot.hasError) {
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
             Fluttertoast.showToast(
                 msg: 'HATA OLUŞTUR !! ',
                 toastLength: Toast.LENGTH_LONG,
@@ -54,171 +62,177 @@ class _GazeteListeleState extends State<GazeteListele> {
                 textColor: Colors.white70,
                 fontSize: 16.0);
           }
-          if(snapshot.connectionState == ConnectionState.waiting){
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child:CircularProgressIndicator(),
+              child: CircularProgressIndicator(),
             );
           }
-          final List gazetelerdocs = [];
+          final List<Gazete> gazeteList = [];
+
           snapshot.data!.docs.map((DocumentSnapshot document) {
-            Map a = document.data() as Map<String, dynamic>;
-            gazetelerdocs.add(a);
-            a['id'] = document.id;
-            print(gazetelerdocs);
+            Gazete gazete =
+                Gazete.fromJson(map: document.data() as Map<String, dynamic>);
+            gazete.gazeteid = document.id;
+            gazeteList.add(gazete);
           }).toList();
 
-          return Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height - 220,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-
-                child: Table(
-
-                  defaultColumnWidth: FlexColumnWidth(1),
-                  border: TableBorder.all(),
-                  columnWidths: const <int,TableColumnWidth>{
-                    1:IntrinsicColumnWidth(),
-                  },
-                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                  children: [
-                    TableRow(
-
-                      children: [
-                        TableCell(child: Container(
-
-                            color: Colors.greenAccent,
-                            child: const Center(
-                              child: Text(
-                                'Gazete Adı:',
-                                style: TextStyle(
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold
-                                ),
-                              ),
-                            )
-                        )
+          return RefreshIndicator(
+            onRefresh: () async {
+              setState(() {
+                gazetelerStream = FirebaseFirestore.instance
+                    .collection('gazeteler')
+                    .snapshots();
+              });
+            },
+            child: ListView.builder(
+                itemCount: gazeteList.length,
+                itemBuilder: ((BuildContext context, int i) {
+                  Gazete gazete = gazeteList[i];
+                  //print("gazete id : "+gazete.gazeteid.toString());
+                  return Dismissible(
+                    key: UniqueKey(),
+                    direction: DismissDirection.horizontal,
+                    onDismissed: (direction) {
+                      setState(() {
+                        gazeteList.removeAt(i);
+                      });
+                    },
+                    background: Container(
+                      color: Colors.red.shade800,
+                      child: Padding(
+                        padding: const EdgeInsets.all(15),
+                        child: Row(
+                          children: const <Widget>[
+                            Icon(Icons.delete_forever, color: Colors.white),
+                            Text('Sil', style: TextStyle(color: Colors.white)),
+                          ],
                         ),
-                        TableCell(
-
-                          child: Container(
-                            color: Colors.greenAccent,
-                            child: const Center(
-                              child: Text(
-                                'Gazete No',
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            color: Colors.greenAccent,
-                            child: const Center(
-                              child: Text(
-                                'İşlem',
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                    for (var i = 0; i < gazetelerdocs.length; i++) ...[
+                    confirmDismiss: (DismissDirection direction) async {
+                      switch (direction) {
+                        case DismissDirection.startToEnd:
+                          return await showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text("Veri silinsin mi?"),
+                                actions: <Widget>[
+                                  ElevatedButton(
+                                      onPressed: () {
+                                        gazeteler
+                                            .doc(gazete.gazeteid)
+                                            .delete()
+                                            .then((x) => {
+                                                  Fluttertoast.showToast(
+                                                      msg:
+                                                          'Gazete Başarıyla Silindi',
+                                                      toastLength:
+                                                          Toast.LENGTH_LONG,
+                                                      gravity:
+                                                          ToastGravity.BOTTOM,
+                                                      timeInSecForIosWeb: 1,
+                                                      backgroundColor:
+                                                          Colors.amber,
+                                                      textColor: Colors.black87,
+                                                      fontSize: 16.0)
+                                                })
+                                            .catchError((error) => {
+                                                  Fluttertoast.showToast(
+                                                      msg:
+                                                          'HATA OLUŞTU !! $error',
+                                                      toastLength:
+                                                          Toast.LENGTH_LONG,
+                                                      gravity:
+                                                          ToastGravity.BOTTOM,
+                                                      timeInSecForIosWeb: 1,
+                                                      backgroundColor:
+                                                          Colors.red,
+                                                      textColor: Colors.white70,
+                                                      fontSize: 16.0)
+                                                });
 
-                      TableRow(
-                          children: [
-                            TableCell(
-
-                              child: Center(
-                                  child: Text(gazetelerdocs[i]['gazeteadi'],
-                                      style: const TextStyle(fontSize: 14.0))),
-                            ),
-                            TableCell(
-                              child: Center(
-                                  child: Text(gazetelerdocs[i]['gazeteno'],
-                                      style: const TextStyle(fontSize: 14.0))),
-                            ),
-                            TableCell(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  IconButton(
-                                    onPressed: () => {
-                                      print('DETAY GAZETE ${gazetelerdocs[i]['id']}')
-                                      /*
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => UpdateStudentPage(
-                                        id: storedocs[i]['id']),
-                                  ),
-                                )
-                                 */
-                                      //print("detay")
-                                    },
-                                    icon: const Icon(
-                                      Icons.edit,
-                                      color: Colors.orange,
-                                    ),
-                                  ),
-                                  IconButton(
+                                        Navigator.of(context).pop(true);
+                                      },
+                                      child: const Text("Sil")),
+                                  ElevatedButton(
                                     onPressed: () =>
-                                    //{deleteUser(storedocs[i]['id'])},
-                                    print("test"),
-                                    icon: const Icon(
-                                      Icons.delete,
-                                      color: Colors.red,
-                                    ),
+                                        Navigator.of(context).pop(false),
+                                    child: const Text("Geri"),
                                   ),
                                 ],
-                              ),
+                              );
+                            },
+                          );
+                        case DismissDirection.endToStart:
+                          return await showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text(
+                                    "Veriyi düzenlemek istiyor musunuz?"),
+                                actions: <Widget>[
+                                  ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(false);
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => GazeteDuzenle(
+                                              gazete: gazete,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: const Text("Düzenle")),
+                                  ElevatedButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(false),
+                                    child: const Text("Geri"),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+
+                        default:
+                      }
+                    },
+                    secondaryBackground: Container(
+                      color: Colors.blue.shade300,
+                      child: Padding(
+                        padding: const EdgeInsets.all(15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: const <Widget>[
+                            Icon(Icons.edit, color: Colors.white),
+                            Text('Düzenle',
+                                style: TextStyle(color: Colors.white)),
+                          ],
+                        ),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: ListTileCustom(
+                        titleText: "Gazete Adı : " + gazete.gazeteadi,
+                        subtitleText: "Gazete No : " + gazete.gazeteno,
+                        leadingIcon: Icons.art_track,
+                        iconColor: Colors.blue,
+                        textColor: Colors.black,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) =>  GazeteDetay(gazete: gazete),
                             ),
-                          ]
-                      )
-                    ]
-                  ],
-                ),
-              )
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                })),
           );
         });
-
-    var gazeteListe = [
-      const ListTile(
-        contentPadding: EdgeInsets.all(5),
-        tileColor: Colors.lightBlueAccent,
-        title: Text('Gazete Adı 1'),
-        subtitle: Text('Gazete No : 1'),
-      ),
-      const ListTile(
-        contentPadding: EdgeInsets.all(5),
-        tileColor: Colors.lightBlueAccent,
-        title: Text('Gazete Adı 2'),
-        subtitle: Text('Gazete No : 2'),
-      ),
-      const ListTile(
-        contentPadding: EdgeInsets.all(5),
-        tileColor: Colors.lightBlueAccent,
-        title: Text('Gazete Adı 3'),
-        subtitle: Text('Gazete No : 3'),
-      ),
-    ];
-    return Scaffold(
-      body: Center(
-        child: ListView.builder(
-            padding: const EdgeInsets.all(5),
-            itemCount: gazeteListe.length,
-            itemBuilder: (context, index) {
-              var gazeteList = gazeteListe[index];
-              return gazeteList;
-            }),
-      ),
-    );
   }
 }
